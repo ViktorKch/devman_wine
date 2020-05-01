@@ -3,4 +3,5 @@ env/
 *.xlsx
 .idea
 __pycache__
+index.html
 

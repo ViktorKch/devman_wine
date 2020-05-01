@@ -1,23 +1,24 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from utils import calculate_years_together, parse_file
-from itertools import chain
+from utils import calculate_years_together, parse_file, parse_args
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
 
-template = env.get_template('template.html')
+if __name__ == '__main__':
+    path = parse_args().filepath
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
 
-rendered_page = template.render(
-    time_together=calculate_years_together(),
-    categories=parse_file(),
-    wines=list(chain.from_iterable(parse_file().values()))
-)
+    template = env.get_template('template.html')
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+    rendered_page = template.render(
+        age_in_years=calculate_years_together(),
+        wines_group_by_categories=parse_file(path),
+    )
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    with open('index.html', 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
